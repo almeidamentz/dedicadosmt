@@ -31,6 +31,9 @@
         .placa select {
             padding: 5px;
         }
+        .button-container {
+            margin-top: 20px;
+        }
     </style>
 </head>
 <body>
@@ -47,6 +50,10 @@
     <div class="result" id="result">
         <h3 id="nomeTransportador"></h3>
         <div id="placas"></div>
+    </div>
+
+    <div class="button-container">
+        <button onclick="baixarCSV()">Salvar Dados em CSV</button>
     </div>
 </div>
 
@@ -104,6 +111,35 @@
             resultado.style.display = 'none';
             alert('Código inválido. Tente novamente.');
         }
+    }
+
+    function baixarCSV() {
+        const codigo = document.getElementById('codigo').value;
+        const transportador = transportadores[codigo];
+        if (!transportador) {
+            alert('Código inválido.');
+            return;
+        }
+
+        const data = new Date();
+        const dataFormatada = `${data.getDate()}/${data.getMonth() + 1}/${data.getFullYear()} ${data.getHours()}:${data.getMinutes()}:${data.getSeconds()}`;
+        
+        let csvContent = "Transportador,Placa,Status,Data\n";
+        
+        transportador.placas.forEach(placa => {
+            const status = document.getElementById(placa).value;
+            csvContent += `${transportador.nome},${placa},${status},${dataFormatada}\n`;
+        });
+
+        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+        const link = document.createElement("a");
+        const url = URL.createObjectURL(blob);
+        link.setAttribute("href", url);
+        link.setAttribute("download", `dados_transportador_${codigo}.csv`);
+        link.style.visibility = 'hidden';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
     }
 </script>
 
